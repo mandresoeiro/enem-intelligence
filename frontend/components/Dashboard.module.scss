@@ -1,0 +1,62 @@
+@use "../app/styles/_variables.scss" as *;
+
+.dashboard {
+  padding: $space-6;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-6;
+}
+
+.title {
+  font-size: $font-2xl;
+  color: $color-primary;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: $space-6;
+}
+
+.card {
+  background: $color-surface;
+  color: $color-text;
+  padding: $space-4;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  transition: $transition-normal;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: $shadow-lg;
+}
+
+.cardTitle {
+  font-size: $font-lg;
+  margin-bottom: $space-2;
+  color: $color-secondary;
+}
+
+.cardValue {
+  font-size: $font-3xl;
+  font-weight: 700;
+}
+
+.sectionTitle {
+  margin-top: $space-8;
+  margin-bottom: $space-4;
+  font-size: $font-xl;
+}
+
+.rechartsWrapper {
+  background: $color-surface;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  padding: $space-4;
+}

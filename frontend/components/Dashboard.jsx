@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { getEstatisticas } from "../services/api";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import styles from "./Dashboard.module.scss";
 
 export default function Dashboard() {
   const [dados, setDados] = useState([]);
@@ -25,16 +26,26 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📊 Estatísticas ENEM</h1>
+    <div className={styles.dashboard}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>📊 Estatísticas ENEM</h1>
+      </div>
 
-      <div className="bg-white rounded-xl shadow p-4">
+      <div className={styles.cardGrid}>
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Média das Notas</h2>
+          <div className={styles.cardValue}>—</div>
+        </div>
+      </div>
+
+      <h2 className={styles.sectionTitle}>Evolução por Ano</h2>
+      <div className={styles.rechartsWrapper}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={dados}>
-            <XAxis dataKey="ano" />
-            <YAxis />
+            <XAxis dataKey="ano" stroke="#94a3b8" />
+            <YAxis stroke="#94a3b8" />
             <Tooltip />
-            <Bar dataKey="media_notas" fill="#2563eb" />
+            <Bar dataKey="media_notas" fill="#0ea5e9" />
           </BarChart>
         </ResponsiveContainer>
       </div>
