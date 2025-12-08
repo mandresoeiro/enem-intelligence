@@ -39,7 +39,7 @@ ls backend/data/
 # Terminal 1
 cd backend && poetry run python manage.py runserver
 
-# Terminal 2  
+# Terminal 2
 cd frontend && npm run dev
 ```
 
@@ -79,15 +79,28 @@ A busca automática por CPF simplesmente não encontrará dados.
 
 ---
 
-## 💡 Dica Pro
+## 💡 Opção Express: Baixar Direto no Trabalho
 
-Se no trabalho você tem internet boa:
+Se você tem internet boa no trabalho, **não precisa transferir nada**!
 
 ```bash
-# Baixar microdados direto (3 GB)
+# 1. Clone e setup
+git clone https://github.com/mandresoeiro/enem-intelligence.git
+cd enem-intelligence
+./setup.sh
+
+# 2. Baixar microdados direto do INEP (3-5 GB)
 cd backend/data
 wget https://download.inep.gov.br/microdados/microdados_enem_2024.zip
-unzip microdados_enem_2024.zip
+unzip microdados_enem_2024.zip -d raw/
+
+# 3. Voltar e rodar
+cd ../..
+cd backend && poetry run python manage.py runserver &
+cd ../frontend && npm run dev
 ```
+
+**Vantagem:** Não precisa transferir nada, sempre tem a versão mais atual!
+**Desvantagem:** Download de ~3-5 GB (demora ~30 min dependendo da internet)
 
 Pronto! ✨

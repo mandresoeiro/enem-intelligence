@@ -21,6 +21,7 @@ Sistema completo para análise de desempenho do ENEM com dashboard profissional,
 
 ### Instalação Rápida
 
+#### Opção 1: Setup Básico (sem microdados)
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/mandresoeiro/enem-intelligence.git
@@ -37,6 +38,17 @@ cd backend && poetry run python manage.py runserver
 cd frontend && npm run dev
 ```
 
+#### Opção 2: Setup Completo (com download de microdados)
+```bash
+# Clone e execute o setup completo em um comando
+git clone https://github.com/mandresoeiro/enem-intelligence.git
+cd enem-intelligence
+./setup_completo.sh
+
+# Já inclui: instalação + download + descompactação dos microdados
+# Depois é só rodar os servidores conforme acima
+```
+
 Acesse: **http://localhost:3000**
 
 ## 📊 Trabalhando com Microdados
@@ -47,21 +59,30 @@ Os arquivos de microdados do ENEM são **muito grandes** (3-5 GB) e **NÃO estã
 
 ### Como Obter os Microdados
 
+#### Opção 1: Download Automático (Recomendado) 🚀
+```bash
+# Após clonar o repositório
+cd enem-intelligence
+./setup_completo.sh
+# Faz tudo: setup + download + descompactação automática
+```
+
+#### Opção 2: Download Manual 📥
 1. **Baixar do Site Oficial:**
    - Acesse: https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados
+   - Ou use: `wget https://download.inep.gov.br/microdados/microdados_enem_2024.zip`
    - Baixe os anos desejados (2024, 2023, etc.)
 
-2. **Colocar no Projeto:**
+2. **Descompactar e Colocar no Projeto:**
    ```bash
-   # Coloque os arquivos em:
-   backend/data/MICRODADOS_ENEM_2024.csv
-   backend/data/MICRODADOS_ENEM_2023.csv
+   cd backend/data
+   unzip microdados_enem_2024.zip -d raw/
    ```
 
-3. **Importar os Dados:**
+3. **Importar os Dados (Opcional):**
    ```bash
    cd backend
-   poetry run python manage.py importar_microdados_enem --csv=data/MICRODADOS_ENEM_2024.csv
+   poetry run python manage.py importar_microdados_enem --csv=data/raw/enem_2024/DADOS/MICRODADOS_ENEM_2024.csv
    ```
 
 ### Transferência entre Ambientes (Casa ↔️ Trabalho)
