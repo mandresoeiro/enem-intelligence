@@ -35,3 +35,20 @@ h1, h2, h3 {
 }
 
 a { color: inherit; text-decoration: none; }
+
+/* Light theme support */
+@media (prefers-color-scheme: light) {
+  body {
+    color: $light-color-text;
+    background: $light-color-bg;
+  }
+
+  .container, .rechartsWrapper, .card {
+    background: $light-color-surface;
+    color: $light-color-text;
+    box-shadow: $shadow-sm;
+    border-color: rgba(0,0,0,0.06);
+  }
+
+  .title, h1, h2, h3 { color: $color-primary; }
+}

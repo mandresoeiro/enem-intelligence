@@ -1,0 +1,51 @@
+@use "./_variables.scss" as *;
+
+// Centered container
+@mixin container() {
+  max-width: $container-max;
+  padding: 0 $container-padding;
+  margin: 0 auto;
+}
+
+// Flex row with gap
+@mixin flex-row($gap: $space-4, $align: center, $justify: space-between) {
+  display: flex;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+// Card base style
+@mixin card() {
+  background: $color-surface;
+  color: $color-text;
+  padding: $space-4;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+// Button variants
+@mixin btn-base() {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  border-radius: $radius-sm;
+  font-weight: 600;
+  transition: $transition-normal;
+}
+
+@mixin btn-primary() {
+  @include btn-base();
+  background: $color-primary;
+  color: #fff;
+  &:hover { filter: brightness(1.05); }
+}
+
+@mixin btn-secondary() {
+  @include btn-base();
+  background: $color-secondary;
+  color: #fff;
+  &:hover { filter: brightness(1.05); }
+}

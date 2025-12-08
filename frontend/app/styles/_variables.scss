@@ -1,4 +1,4 @@
-// Color palette
+// Color palette (default: dark)
 $color-primary: #1e40af; // Indigo-700
 $color-secondary: #0ea5e9; // Sky-500
 $color-accent: #22c55e; // Green-500
@@ -6,6 +6,12 @@ $color-bg: #0b1020; // Dark background
 $color-surface: #0f172a; // Slate-900
 $color-text: #e5e7eb; // Gray-200
 $color-muted: #94a3b8; // Slate-400
+
+// Light theme overrides (optional import)
+$light-color-bg: #ffffff;
+$light-color-surface: #f8fafc; // slate-50
+$light-color-text: #0f172a; // slate-900
+$light-color-muted: #475569; // slate-600
 
 // Spacing scale
 $space-0: 0;
