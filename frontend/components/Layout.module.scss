@@ -1,0 +1,15 @@
+.layoutWrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 280px;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+}

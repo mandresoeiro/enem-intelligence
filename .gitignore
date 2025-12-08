@@ -10,6 +10,14 @@ venv/
 /media/
 /staticfiles/
 /local_settings.py
+*.db
+*.sqlite3
+db.sqlite3
+
+# Dados do ENEM (arquivos muito grandes - não versionar)
+backend/data/*.csv
+backend/data/*.zip
+backend/data/MICRODADOS_*
 
 # Node/Next.js
 node_modules/

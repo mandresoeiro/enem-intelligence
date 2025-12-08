@@ -1,1 +1,48 @@
-site_name: My Docs
+site_name: ENEM Intelligence Docs
+site_description: "Documentação técnica do ENEM Intelligence (Django + Next.js)"
+site_url: "https://enem-intelligence-docs.local"  # ajuste quando publicar
+
+theme:
+  name: material
+  language: pt
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Mudar para tema claro
+    - scheme: default
+      primary: indigo
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Mudar para tema escuro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.instant
+    - toc.integrate
+    - content.code.copy
+
+nav:
+  - Visão Geral: docs/index.md
+  - Backend (Django):
+      - Ambiente e Setup: environment.md
+      - Checklist Inicial: "docs/1º etapa-Checklist.md"
+      - Python Decouple: docs/python_decouple_section.md
+  - Referência do Projeto:
+      - Estrutura de Pastas: projeto-discriminado/dev
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mandresoeiro/enem-intelligence
+      name: Código-fonte no GitHub

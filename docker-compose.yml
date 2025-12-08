@@ -1,0 +1,83 @@
+# ==========================================================
+# 🐳 ENEM Data Portal — Docker Compose
+# ==========================================================
+# Estrutura completa do ambiente:
+# - Django + DRF (Poetry)
+# - PostgreSQL
+# - Next.js + TypeScript + Sass
+# - Redis
+# - MkDocs (Documentação, dentro de backend/docs)
+# ==========================================================
+
+services:
+  # ========================================================
+  # 🐍 Backend — Django + DRF (via Poetry)
+  # ========================================================
+  backend:
+    build: ./backend
+    container_name: enem_backend
+    command: poetry run python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+
+  # ========================================================
+  # 🗄️ Banco de Dados — PostgreSQL
+  # ========================================================
+  db:
+    image: postgres:15
+    container_name: enem_db
+    restart: always
+    environment:
+      POSTGRES_DB: enemdb
+      POSTGRES_USER: enemuser
+      POSTGRES_PASSWORD: supersecret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ========================================================
+  # ⚛️ Frontend — Next.js + TypeScript + Sass
+  # ========================================================
+  frontend:
+    build: ./frontend
+    container_name: enem_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+    depends_on:
+      - backend
+
+  # ========================================================
+  # 🚀 Cache — Redis (para cache e tarefas assíncronas)
+  # ========================================================
+  redis:
+    image: redis:7
+    container_name: enem_redis
+    ports:
+      - "6379:6379"
+
+  # ========================================================
+  # 📘 Documentação — MkDocs (localizada em backend/docs)
+  # ========================================================
+  docs:
+    build: ./backend/docs
+    container_name: enem_docs
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend/docs:/docs
+
+# ==========================================================
+# 💾 Volumes persistentes
+# ==========================================================
+volumes:
+  postgres_data:

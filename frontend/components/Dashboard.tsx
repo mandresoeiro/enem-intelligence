@@ -16,7 +16,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import styles from "./Dashboard.module.scss";
-import DashboardStatus from "./DashboardStatus";
 
 export default function Dashboard() {
   const [dados, setDados] = useState([]);
@@ -39,8 +38,12 @@ export default function Dashboard() {
         <h1 className={styles.title}>📊 Estatísticas ENEM</h1>
       </div>
 
-      {/* Status dos dados importados */}
-      <DashboardStatus />
+      <div className={styles.cardGrid}>
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Média das Notas</h2>
+          <div className={styles.cardValue}>—</div>
+        </div>
+      </div>
 
       <h2 className={styles.sectionTitle}>Evolução por Ano</h2>
       <div className={styles.rechartsWrapper}>

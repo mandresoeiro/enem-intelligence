@@ -1,0 +1,88 @@
+"""
+Utilitários para buscar dados nos microdados do ENEM
+"""
+
+import os
+
+import pandas as pd
+from django.conf import settings
+
+
+def buscar_notas_por_cpf(cpf, ano=None):
+    """
+    Busca as notas de um aluno nos microdados do ENEM pelo CPF
+
+    Args:
+        cpf (str): CPF do aluno (com ou sem formatação)
+        ano (int, optional): Ano específico para buscar (2024, 2023, etc.).
+                            Se None, busca em todos os anos disponíveis.
+
+    Returns:
+        dict: Dicionário com as notas ou None se não encontrado
+    """
+    # Remove formatação do CPF
+    cpf_limpo = "".join(filter(str.isdigit, str(cpf))).zfill(11)
+
+    # Define os anos para buscar
+    anos = [ano] if ano else [2024, 2023, 2022]
+
+    # Tenta localizar os arquivos de microdados
+    for ano_busca in anos:
+        possible_paths = [
+            os.path.join(settings.BASE_DIR, "data", f"MICRODADOS_ENEM_{ano_busca}.csv"),
+            os.path.join(
+                settings.BASE_DIR, "..", "data", f"MICRODADOS_ENEM_{ano_busca}.csv"
+            ),
+            f"/tmp/MICRODADOS_ENEM_{ano_busca}.csv",
+        ]
+
+        csv_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                csv_path = path
+                break
+
+        if not csv_path:
+            continue
+
+        try:
+            # Lê o arquivo CSV (pode ser pesado, considere otimizações)
+            df = pd.read_csv(csv_path, sep=";", encoding="latin1", low_memory=False)
+
+            # Busca o CPF no dataframe
+            df["NU_CPF"] = df["NU_CPF"].astype(str).str.zfill(11)
+            aluno_data = df[df["NU_CPF"] == cpf_limpo]
+
+            if not aluno_data.empty:
+                # Retorna as notas
+                row = aluno_data.iloc[0]
+                return {
+                    "ano": ano_busca,
+                    "nota_enem_matematica": (
+                        float(row.get("NU_NOTA_MT", 0))
+                        if pd.notna(row.get("NU_NOTA_MT"))
+                        else None
+                    ),
+                    "nota_enem_linguagens": (
+                        float(row.get("NU_NOTA_LC", 0))
+                        if pd.notna(row.get("NU_NOTA_LC"))
+                        else None
+                    ),
+                    "nota_enem_ciencias": (
+                        float(row.get("NU_NOTA_CN", 0))
+                        if pd.notna(row.get("NU_NOTA_CN"))
+                        else None
+                    ),
+                    "nota_enem_humanas": (
+                        float(row.get("NU_NOTA_CH", 0))
+                        if pd.notna(row.get("NU_NOTA_CH"))
+                        else None
+                    ),
+                    "uf": row.get("SG_UF_PROVA", ""),
+                }
+        except Exception as e:
+            print(f"Erro ao buscar notas no arquivo {csv_path}: {e}")
+            continue
+
+    # Se chegou aqui, não encontrou em nenhum ano
+    return None

@@ -5,17 +5,37 @@
 # ==========================================================
 
 from django.contrib import admin
-from .models import Aluno, Curso, Inscricao, Estatistica
+
+from .models import Aluno, Curso, EstatisticaEstado, Inscricao, Simulado
+
 
 # ==========================================================
 # 🎓 Aluno
 # ==========================================================
 @admin.register(Aluno)
 class AlunoAdmin(admin.ModelAdmin):
-    list_display = ("id", "nome", "cpf", "uf")
+    list_display = (
+        "id",
+        "nome",
+        "cpf",
+        "uf",
+        "nota_enem_matematica",
+        "nota_enem_linguagens",
+    )
     search_fields = ("nome", "cpf")
     list_filter = ("uf",)
     ordering = ("nome",)
+
+
+# ==========================================================
+# 📝 Simulado
+# ==========================================================
+@admin.register(Simulado)
+class SimuladoAdmin(admin.ModelAdmin):
+    list_display = ("id", "aluno", "tipo", "data", "nota_matematica", "nota_linguagens")
+    list_filter = ("tipo", "data")
+    search_fields = ("aluno__nome", "tipo")
+    ordering = ("-data",)
 
 
 # ==========================================================
@@ -39,10 +59,10 @@ class InscricaoAdmin(admin.ModelAdmin):
 
 
 # ==========================================================
-# 📊 Estatística
+# 📊 Estatística por Estado
 # ==========================================================
-@admin.register(Estatistica)
-class EstatisticaAdmin(admin.ModelAdmin):
-    list_display = ("id", "curso", "ano", "media_notas", "total_inscritos")
-    list_filter = ("ano", "curso")
-    ordering = ("-ano",)
+@admin.register(EstatisticaEstado)
+class EstatisticaEstadoAdmin(admin.ModelAdmin):
+    list_display = ("id", "estado", "area", "ano", "media_nota")
+    list_filter = ("ano", "estado", "area")
+    ordering = ("-ano", "estado", "area")
