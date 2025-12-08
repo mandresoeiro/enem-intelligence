@@ -1,0 +1,37 @@
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# Ambientes virtuais
+.venv/
+env/
+venv/
+
+# Arquivos do Django
+db.sqlite3
+media/
+static/
+
+# Ambiente local
+.env
+.env.*
+
+# Configurações e IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Arquivos de build
+*.egg-info/
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.mo
+
+# MkDocs
+/site/
