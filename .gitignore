@@ -18,6 +18,7 @@ db.sqlite3
 backend/data/*.csv
 backend/data/*.zip
 backend/data/MICRODADOS_*
+backend/data/raw/
 
 # Node/Next.js
 node_modules/
