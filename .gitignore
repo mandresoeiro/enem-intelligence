@@ -40,3 +40,4 @@ Thumbs.db
 
 # MkDocs (build da documentação)
 backend/docs/site/
+backend/docs/.cache/
