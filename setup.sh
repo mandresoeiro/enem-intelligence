@@ -36,6 +36,15 @@ fi
 poetry install
 echo -e "${GREEN}✓ Dependências do backend instaladas${NC}"
 
+# Verificar pandas
+echo -e "${BLUE}🔎 Verificando pandas...${NC}"
+if ! poetry run python -c "import pandas" >/dev/null 2>&1; then
+    echo -e "${YELLOW}⚠️  pandas não encontrado. Instalando...${NC}"
+    poetry add pandas
+else
+    echo -e "${GREEN}✓ pandas OK${NC}"
+fi
+
 # Criar diretório de dados se não existir
 mkdir -p data
 echo -e "${GREEN}✓ Diretório de dados criado${NC}"
@@ -107,3 +116,11 @@ echo "  cd frontend && npm run dev"
 echo ""
 echo "Depois acesse: http://localhost:3000"
 echo ""
+
+# Sugestão: iniciar via Docker Compose, se disponível
+if command -v docker >/dev/null 2>&1; then
+    echo -e "${BLUE}🐳 Docker detectado. Você pode subir tudo com:${NC}"
+    echo "  cd .. && docker compose up --build"
+else
+    echo -e "${YELLOW}🐳 Docker não encontrado. Use os comandos acima ou instale Docker/Compose.${NC}"
+fi

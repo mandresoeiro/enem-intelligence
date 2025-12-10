@@ -10,6 +10,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { icon: "📊", label: "Dashboard", href: "/" },
+    { icon: "🔍", label: "Buscar Aluno", href: "/buscar-aluno" },
     { icon: "👨‍🎓", label: "Alunos", href: "/alunos" },
     { icon: "📝", label: "Simulados", href: "/simulados" },
     { icon: "🎯", label: "Cursos", href: "/cursos" },

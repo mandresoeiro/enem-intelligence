@@ -18,7 +18,8 @@ RUN pip install poetry
 
 # Copia arquivos do Poetry e instala dependências
 COPY pyproject.toml poetry.lock* ./
-RUN poetry install --no-root
+# Garante que o lock esteja atualizado com o pyproject (inclui novas deps como pandas)
+RUN poetry lock --no-interaction && poetry install --no-root --no-interaction
 
 # Copia o restante do backend
 COPY . .

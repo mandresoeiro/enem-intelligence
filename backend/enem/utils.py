@@ -3,6 +3,7 @@ Utilitários para buscar dados nos microdados do ENEM
 """
 
 import os
+import glob
 
 import pandas as pd
 from django.conf import settings
@@ -28,12 +29,17 @@ def buscar_notas_por_cpf(cpf, ano=None):
 
     # Tenta localizar os arquivos de microdados
     for ano_busca in anos:
+        # Caminhos diretos comuns
         possible_paths = [
             os.path.join(settings.BASE_DIR, "data", f"MICRODADOS_ENEM_{ano_busca}.csv"),
-            os.path.join(
-                settings.BASE_DIR, "..", "data", f"MICRODADOS_ENEM_{ano_busca}.csv"
-            ),
+            os.path.join(settings.BASE_DIR, "..", "data", f"MICRODADOS_ENEM_{ano_busca}.csv"),
             f"/tmp/MICRODADOS_ENEM_{ano_busca}.csv",
+        ]
+
+        # Busca automática em estruturas extraídas dos microdados oficiais (raw/DADOS)
+        raw_search_patterns = [
+            os.path.join(settings.BASE_DIR, "data", "raw", "**", "DADOS", f"MICRODADOS_ENEM_{ano_busca}.csv"),
+            os.path.join(settings.BASE_DIR, "..", "data", "raw", "**", "DADOS", f"MICRODADOS_ENEM_{ano_busca}.csv"),
         ]
 
         csv_path = None
@@ -41,6 +47,15 @@ def buscar_notas_por_cpf(cpf, ano=None):
             if os.path.exists(path):
                 csv_path = path
                 break
+
+        # Se não encontrou nos caminhos diretos, tenta via glob nas pastas raw
+        if not csv_path:
+            for pattern in raw_search_patterns:
+                matches = glob.glob(pattern, recursive=True)
+                if matches:
+                    # seleciona o primeiro match
+                    csv_path = matches[0]
+                    break
 
         if not csv_path:
             continue
