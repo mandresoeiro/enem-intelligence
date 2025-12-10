@@ -26,13 +26,11 @@ theme:
     - content.code.copy
 
 nav:
-  - Visão Geral: docs/index.md
+  - Visão Geral: index.md
   - Backend (Django):
       - Ambiente e Setup: environment.md
-      - Checklist Inicial: "docs/1º etapa-Checklist.md"
-      - Python Decouple: docs/python_decouple_section.md
-  - Referência do Projeto:
-      - Estrutura de Pastas: projeto-discriminado/dev
+      - Checklist Inicial: "1º etapa-Checklist.md"
+      - Python Decouple: python_decouple_section.md
 
 markdown_extensions:
   - admonition
