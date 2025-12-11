@@ -7,28 +7,15 @@ import styles from './BuscaAluno.module.scss';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8001/api/enem/";
 
 export default function BuscaAluno() {
-  const [cpf, setCpf] = useState('');
+  const [inscricao, setInscricao] = useState('');
   const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [erro, setErro] = useState(null);
 
-  const formatarCPF = (valor) => {
+  const handleInscricaoChange = (e) => {
     // Remove tudo que não é número
-    const numeros = valor.replace(/\D/g, '');
-
-    // Aplica máscara XXX.XXX.XXX-XX
-    if (numeros.length <= 11) {
-      return numeros
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    }
-    return numeros.slice(0, 11);
-  };
-
-  const handleCpfChange = (e) => {
-    const valorFormatado = formatarCPF(e.target.value);
-    setCpf(valorFormatado);
+    const numeros = e.target.value.replace(/\D/g, '');
+    setInscricao(numeros);
   };
 
   const buscarNotas = async (e) => {
@@ -38,21 +25,19 @@ export default function BuscaAluno() {
     setResultado(null);
 
     try {
-      const cpfLimpo = cpf.replace(/\D/g, '');
-      
       // Aumenta timeout para 60 segundos (busca em arquivo grande)
       const response = await axios.post(
         `${API_BASE_URL}alunos/buscar_notas_cpf/`,
-        { cpf: cpfLimpo },
-        { timeout: 60000 } // 60 segundos
+        { cpf: inscricao },
+        { timeout: 60000 }
       );
 
       setResultado(response.data);
     } catch (error) {
       if (error.code === 'ECONNABORTED') {
-        setErro('A busca está demorando muito. Isso pode indicar que o arquivo é muito grande ou o CPF não existe. Tente novamente mais tarde.');
+        setErro('A busca está demorando muito. Isso pode indicar que o arquivo é muito grande ou o número de inscrição não existe. Tente novamente mais tarde.');
       } else if (error.response?.status === 404) {
-        setErro('Notas não encontradas para este CPF. Verifique se o CPF está correto e se você prestou o ENEM entre 2022 e 2024.');
+        setErro('Notas não encontradas para este número de inscrição. Verifique se está correto e se você prestou o ENEM entre 2022 e 2024.');
       } else if (error.message === 'Network Error') {
         setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
       } else {
@@ -80,22 +65,22 @@ export default function BuscaAluno() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h2 className={styles.titulo}>🔍 Buscar Notas do ENEM por CPF</h2>
+        <h2 className={styles.titulo}>🔍 Buscar Notas do ENEM por Número de Inscrição</h2>
         <p className={styles.descricao}>
-          Consulte suas notas do ENEM de 2022, 2023 ou 2024 usando seu CPF.
+          Consulte suas notas do ENEM de 2022, 2023 ou 2024 usando seu número de inscrição.
           Não é necessário cadastro prévio!
         </p>
 
         <form onSubmit={buscarNotas} className={styles.formulario}>
           <div className={styles.inputGroup}>
-            <label htmlFor="cpf">CPF</label>
+            <label htmlFor="inscricao">Número de Inscrição</label>
             <input
-              id="cpf"
+              id="inscricao"
               type="text"
-              value={cpf}
-              onChange={handleCpfChange}
-              placeholder="000.000.000-00"
-              maxLength="14"
+              value={inscricao}
+              onChange={handleInscricaoChange}
+              placeholder="Digite seu número de inscrição"
+              maxLength="12"
               required
               className={styles.input}
             />
@@ -103,7 +88,7 @@ export default function BuscaAluno() {
 
           <button
             type="submit"
-            disabled={loading || cpf.replace(/\D/g, '').length !== 11}
+            disabled={loading || inscricao.length < 12}
             className={styles.botaoBuscar}
           >
             {loading ? '🔄 Buscando... (pode levar até 60s)' : '🔍 Buscar Notas'}
@@ -126,6 +111,9 @@ export default function BuscaAluno() {
         {resultado && (
           <div className={styles.resultado}>
             <h3>✅ Notas Encontradas - ENEM {resultado.ano}</h3>
+            <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '1rem'}}>
+              Inscrição: {resultado.inscricao}
+            </p>
 
             <div className={styles.notasGrid}>
               <div className={styles.notaCard}>

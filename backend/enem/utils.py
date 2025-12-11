@@ -11,19 +11,20 @@ from django.conf import settings
 
 def buscar_notas_por_cpf(cpf, ano=None):
     """
-    Busca as notas de um aluno nos microdados do ENEM pelo CPF
+    Busca as notas de um aluno nos microdados do ENEM pelo número de inscrição
+    NOTA: A nomenclatura 'cpf' é mantida para compatibilidade, mas recebe NU_INSCRICAO
     Otimizado para ler arquivos grandes em chunks
 
     Args:
-        cpf (str): CPF do aluno (com ou sem formatação)
+        cpf (str): Número de inscrição do aluno (NU_INSCRICAO)
         ano (int, optional): Ano específico para buscar (2024, 2023, etc.).
                             Se None, busca em todos os anos disponíveis.
 
     Returns:
         dict: Dicionário com as notas ou None se não encontrado
     """
-    # Remove formatação do CPF
-    cpf_limpo = "".join(filter(str.isdigit, str(cpf))).zfill(11)
+    # Remove formatação e espaços
+    inscricao = "".join(filter(str.isdigit, str(cpf)))
 
     # Define os anos para buscar
     anos = [ano] if ano else [2024, 2023, 2022]
@@ -65,23 +66,24 @@ def buscar_notas_por_cpf(cpf, ano=None):
             continue
 
         try:
-            print(f"Buscando CPF {cpf_limpo} no arquivo {csv_path}...")
+            print(f"Buscando inscrição {inscricao} no arquivo {csv_path}...")
             
             # Lê o arquivo em chunks para otimizar performance
             chunk_size = 100000  # 100k linhas por vez
             
             for chunk in pd.read_csv(csv_path, sep=";", encoding="latin1", 
                                     low_memory=False, chunksize=chunk_size):
-                # Busca o CPF no chunk atual
-                chunk["NU_CPF"] = chunk["NU_CPF"].astype(str).str.zfill(11)
-                aluno_data = chunk[chunk["NU_CPF"] == cpf_limpo]
+                # Busca o número de inscrição no chunk atual
+                chunk["NU_INSCRICAO"] = chunk["NU_INSCRICAO"].astype(str)
+                aluno_data = chunk[chunk["NU_INSCRICAO"] == inscricao]
 
                 if not aluno_data.empty:
                     # Retorna as notas
                     row = aluno_data.iloc[0]
-                    print(f"CPF encontrado no ano {ano_busca}!")
+                    print(f"Inscrição encontrada no ano {ano_busca}!")
                     return {
                         "ano": ano_busca,
+                        "inscricao": inscricao,
                         "nota_enem_matematica": (
                             float(row.get("NU_NOTA_MT", 0))
                             if pd.notna(row.get("NU_NOTA_MT"))
@@ -105,12 +107,12 @@ def buscar_notas_por_cpf(cpf, ano=None):
                         "uf": row.get("SG_UF_PROVA", ""),
                     }
             
-            print(f"CPF não encontrado no arquivo do ano {ano_busca}")
+            print(f"Inscrição não encontrada no arquivo do ano {ano_busca}")
                     
         except Exception as e:
             print(f"Erro ao buscar notas no arquivo {csv_path}: {e}")
             continue
 
     # Se chegou aqui, não encontrou em nenhum ano
-    print(f"CPF {cpf_limpo} não encontrado em nenhum arquivo de microdados")
+    print(f"Inscrição {inscricao} não encontrada em nenhum arquivo de microdados")
     return None
