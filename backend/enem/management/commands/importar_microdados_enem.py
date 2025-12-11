@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 from django.core.management.base import BaseCommand
 
@@ -5,19 +6,35 @@ from enem.models import Aluno, EstatisticaEstado
 
 
 class Command(BaseCommand):
-    help = "Importa microdados ENEM 2024 para alunos e estatísticas por estado"
+    help = "Importa microdados ENEM (2023, 2024 ou outros anos) para alunos e estatísticas por estado"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--csv",
             type=str,
             required=True,
-            help="Caminho do arquivo CSV dos microdados ENEM 2024",
+            help="Caminho do arquivo CSV dos microdados ENEM",
+        )
+        parser.add_argument(
+            "--ano",
+            type=int,
+            default=None,
+            help="Ano dos dados (extraído automaticamente do nome do arquivo se não fornecido)",
         )
 
     def handle(self, *args, **options):
         path = options["csv"]
-        self.stdout.write(f"🔎 Lendo microdados: {path}")
+        ano = options["ano"]
+        
+        # Tenta extrair o ano do nome do arquivo se não foi fornecido
+        if not ano:
+            match = re.search(r"20\d{2}", path)
+            if match:
+                ano = int(match.group())
+            else:
+                ano = 2024  # Default
+        
+        self.stdout.write(f"🔎 Lendo microdados do ENEM {ano}: {path}")
         df = pd.read_csv(path, sep=";", encoding="latin1", low_memory=False)
 
         # Importa notas ENEM para alunos já cadastrados
@@ -34,7 +51,7 @@ class Command(BaseCommand):
                 aluno.save()
                 count_importados += 1
         self.stdout.write(
-            f"✅ Notas ENEM importadas para {count_importados} alunos cadastrados."
+            f"✅ Notas ENEM {ano} importadas para {count_importados} alunos cadastrados."
         )
 
         # Calcula médias por estado
@@ -44,11 +61,10 @@ class Command(BaseCommand):
             ("NU_NOTA_CN", "ciencias"),
             ("NU_NOTA_CH", "humanas"),
         ]
-        ano = 2024
         for estado, grupo in df.groupby("SG_UF_PROVA"):
             for col, area in areas:
                 media = grupo[col].mean()
                 EstatisticaEstado.objects.update_or_create(
                     ano=ano, estado=estado, area=area, defaults={"media_nota": media}
                 )
-        self.stdout.write(f"✅ Médias por estado calculadas e salvas.")
+        self.stdout.write(f"✅ Médias por estado do ENEM {ano} calculadas e salvas.")

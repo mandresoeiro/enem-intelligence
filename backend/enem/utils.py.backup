@@ -12,7 +12,6 @@ from django.conf import settings
 def buscar_notas_por_cpf(cpf, ano=None):
     """
     Busca as notas de um aluno nos microdados do ENEM pelo CPF
-    Otimizado para ler arquivos grandes em chunks
 
     Args:
         cpf (str): CPF do aluno (com ou sem formatação)
@@ -65,52 +64,43 @@ def buscar_notas_por_cpf(cpf, ano=None):
             continue
 
         try:
-            print(f"Buscando CPF {cpf_limpo} no arquivo {csv_path}...")
-            
-            # Lê o arquivo em chunks para otimizar performance
-            chunk_size = 100000  # 100k linhas por vez
-            
-            for chunk in pd.read_csv(csv_path, sep=";", encoding="latin1", 
-                                    low_memory=False, chunksize=chunk_size):
-                # Busca o CPF no chunk atual
-                chunk["NU_CPF"] = chunk["NU_CPF"].astype(str).str.zfill(11)
-                aluno_data = chunk[chunk["NU_CPF"] == cpf_limpo]
+            # Lê o arquivo CSV (pode ser pesado, considere otimizações)
+            df = pd.read_csv(csv_path, sep=";", encoding="latin1", low_memory=False)
 
-                if not aluno_data.empty:
-                    # Retorna as notas
-                    row = aluno_data.iloc[0]
-                    print(f"CPF encontrado no ano {ano_busca}!")
-                    return {
-                        "ano": ano_busca,
-                        "nota_enem_matematica": (
-                            float(row.get("NU_NOTA_MT", 0))
-                            if pd.notna(row.get("NU_NOTA_MT"))
-                            else None
-                        ),
-                        "nota_enem_linguagens": (
-                            float(row.get("NU_NOTA_LC", 0))
-                            if pd.notna(row.get("NU_NOTA_LC"))
-                            else None
-                        ),
-                        "nota_enem_ciencias": (
-                            float(row.get("NU_NOTA_CN", 0))
-                            if pd.notna(row.get("NU_NOTA_CN"))
-                            else None
-                        ),
-                        "nota_enem_humanas": (
-                            float(row.get("NU_NOTA_CH", 0))
-                            if pd.notna(row.get("NU_NOTA_CH"))
-                            else None
-                        ),
-                        "uf": row.get("SG_UF_PROVA", ""),
-                    }
-            
-            print(f"CPF não encontrado no arquivo do ano {ano_busca}")
-                    
+            # Busca o CPF no dataframe
+            df["NU_CPF"] = df["NU_CPF"].astype(str).str.zfill(11)
+            aluno_data = df[df["NU_CPF"] == cpf_limpo]
+
+            if not aluno_data.empty:
+                # Retorna as notas
+                row = aluno_data.iloc[0]
+                return {
+                    "ano": ano_busca,
+                    "nota_enem_matematica": (
+                        float(row.get("NU_NOTA_MT", 0))
+                        if pd.notna(row.get("NU_NOTA_MT"))
+                        else None
+                    ),
+                    "nota_enem_linguagens": (
+                        float(row.get("NU_NOTA_LC", 0))
+                        if pd.notna(row.get("NU_NOTA_LC"))
+                        else None
+                    ),
+                    "nota_enem_ciencias": (
+                        float(row.get("NU_NOTA_CN", 0))
+                        if pd.notna(row.get("NU_NOTA_CN"))
+                        else None
+                    ),
+                    "nota_enem_humanas": (
+                        float(row.get("NU_NOTA_CH", 0))
+                        if pd.notna(row.get("NU_NOTA_CH"))
+                        else None
+                    ),
+                    "uf": row.get("SG_UF_PROVA", ""),
+                }
         except Exception as e:
             print(f"Erro ao buscar notas no arquivo {csv_path}: {e}")
             continue
 
     # Se chegou aqui, não encontrou em nenhum ano
-    print(f"CPF {cpf_limpo} não encontrado em nenhum arquivo de microdados")
     return None

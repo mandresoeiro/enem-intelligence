@@ -15,7 +15,7 @@ export default function BuscaAluno() {
   const formatarCPF = (valor) => {
     // Remove tudo que não é número
     const numeros = valor.replace(/\D/g, '');
-    
+
     // Aplica máscara XXX.XXX.XXX-XX
     if (numeros.length <= 11) {
       return numeros
@@ -39,14 +39,22 @@ export default function BuscaAluno() {
 
     try {
       const cpfLimpo = cpf.replace(/\D/g, '');
-      const response = await axios.post(`${API_BASE_URL}alunos/buscar_notas_cpf/`, {
-        cpf: cpfLimpo
-      });
       
+      // Aumenta timeout para 60 segundos (busca em arquivo grande)
+      const response = await axios.post(
+        `${API_BASE_URL}alunos/buscar_notas_cpf/`,
+        { cpf: cpfLimpo },
+        { timeout: 60000 } // 60 segundos
+      );
+
       setResultado(response.data);
     } catch (error) {
-      if (error.response?.status === 404) {
+      if (error.code === 'ECONNABORTED') {
+        setErro('A busca está demorando muito. Isso pode indicar que o arquivo é muito grande ou o CPF não existe. Tente novamente mais tarde.');
+      } else if (error.response?.status === 404) {
         setErro('Notas não encontradas para este CPF. Verifique se o CPF está correto e se você prestou o ENEM entre 2022 e 2024.');
+      } else if (error.message === 'Network Error') {
+        setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.');
       } else {
         setErro('Erro ao buscar notas. Tente novamente mais tarde.');
       }
@@ -63,7 +71,7 @@ export default function BuscaAluno() {
       notas.nota_enem_ciencias,
       notas.nota_enem_humanas
     ].filter(n => n !== null && n !== undefined);
-    
+
     if (valores.length === 0) return 0;
     const soma = valores.reduce((acc, val) => acc + val, 0);
     return (soma / valores.length).toFixed(2);
@@ -93,14 +101,20 @@ export default function BuscaAluno() {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading || cpf.replace(/\D/g, '').length !== 11}
             className={styles.botaoBuscar}
           >
-            {loading ? '🔄 Buscando...' : '🔍 Buscar Notas'}
+            {loading ? '🔄 Buscando... (pode levar até 60s)' : '🔍 Buscar Notas'}
           </button>
         </form>
+
+        {loading && (
+          <div className={styles.info} style={{marginTop: '1rem', color: '#666'}}>
+            ⏳ A busca pode demorar alguns minutos devido ao tamanho dos arquivos de microdados...
+          </div>
+        )}
 
         {erro && (
           <div className={styles.erro}>
@@ -112,7 +126,7 @@ export default function BuscaAluno() {
         {resultado && (
           <div className={styles.resultado}>
             <h3>✅ Notas Encontradas - ENEM {resultado.ano}</h3>
-            
+
             <div className={styles.notasGrid}>
               <div className={styles.notaCard}>
                 <span className={styles.materia}>📐 Matemática</span>
